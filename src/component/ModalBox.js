@@ -6,7 +6,7 @@ import { setSelectedTodoId } from "../redux/reducer/todoReducer";
 const ModalBox = ({ modalBtnClick, popupTitle, popupDesc }) => {
   const { selectedTodoId } = useSelector((state) => state.todos);
   const dispatch = useDispatch();
-  const closeDeleteModal = () => {
+  const closeModalBox = () => {
     dispatch(setShowModal({ addUpdateModal: false, deletedModal: false }));
     dispatch(setSelectedTodoId(null));
   };
@@ -15,7 +15,7 @@ const ModalBox = ({ modalBtnClick, popupTitle, popupDesc }) => {
       <p className="text-2xl text-left w-[80%] mx-auto mb-6">{popupTitle}</p>
       <p className="text-base text-left w-[80%] mx-auto mb-6">{popupDesc}</p>
       <div className="flex justify-between w-[80%] mx-auto text-lg">
-        <button className="px-4 py-1 border rounde" onClick={closeDeleteModal}>
+        <button className="px-4 py-1 border rounde" onClick={closeModalBox}>
           Cancel
         </button>
         <button
