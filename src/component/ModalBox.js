@@ -1,7 +1,5 @@
 import React from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { setShowModal } from "../redux/reducer/modalReducer";
-import { setSelectedTodoId } from "../redux/reducer/todoReducer";
+import { useSelector } from "react-redux";
 
 const ModalBox = ({
   modalBtnClick,
