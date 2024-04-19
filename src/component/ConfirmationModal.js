@@ -1,11 +1,11 @@
 import React from "react";
 import { useSelector } from "react-redux";
 
-const ModalBox = ({
+const ConfirmationModal = ({
   modalBtnClick,
   popupTitle,
   popupDesc,
-  closeModalBox,
+  closeConfirmationModal,
   btnText,
 }) => {
   const { selectedTodoId } = useSelector((state) => state.todos);
@@ -14,7 +14,10 @@ const ModalBox = ({
       <p className="text-2xl text-left w-[80%] mx-auto mb-6">{popupTitle}</p>
       <p className="text-base text-left w-[80%] mx-auto mb-6">{popupDesc}</p>
       <div className="flex justify-between w-[80%] mx-auto text-lg">
-        <button className="px-4 py-1 border rounde" onClick={closeModalBox}>
+        <button
+          className="px-4 py-1 border rounde"
+          onClick={closeConfirmationModal}
+        >
           Cancel
         </button>
         <button
@@ -28,4 +31,4 @@ const ModalBox = ({
   );
 };
 
-export default ModalBox;
+export default ConfirmationModal;

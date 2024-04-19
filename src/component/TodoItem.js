@@ -6,7 +6,11 @@ import moment from "moment";
 import { useDispatch } from "react-redux";
 import { isTodoComplete } from "../redux/reducer/todoReducer";
 
-const TodoItem = ({ todo, openModalBox, updateDataInTodoInputValue }) => {
+const TodoItem = ({
+  todo,
+  openConfirmationModal,
+  updateDataInTodoInputValue,
+}) => {
   const dispatch = useDispatch();
   const boxColor = todo.isComplete ? "bg-green-500" : "bg-purple-600";
   return (
@@ -29,7 +33,7 @@ const TodoItem = ({ todo, openModalBox, updateDataInTodoInputValue }) => {
         </div>
         <div className="flex items-center justify-center gap-1 w-[22%]">
           <div className="flex items-center text-xl cursor-pointer">
-            <MdDelete onClick={() => openModalBox(todo)} />
+            <MdDelete onClick={() => openConfirmationModal(todo)} />
             <MdEdit onClick={() => updateDataInTodoInputValue(todo)} />
           </div>
           <div

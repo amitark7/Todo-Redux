@@ -4,7 +4,7 @@ import { AiOutlinePlusCircle } from "react-icons/ai";
 import TodoItem from "./TodoItem";
 import moment from "moment";
 import AddOrUpdateModal from "./AddOrUpdateModal";
-import ModalBox from "./ModalBox";
+import ConfirmationModal from "./ConfirmationModal";
 import { useDispatch, useSelector } from "react-redux";
 import {
   addTodo,
@@ -106,12 +106,12 @@ const Todos = () => {
     dispatch(setSelectedTodoId(null));
   };
 
-  const openModalBox = (todo) => {
+  const openConfirmationModal = (todo) => {
     dispatch(setShowModal({ addUpdateModal: false, deletedModal: true }));
     dispatch(setSelectedTodoId(todo.id));
   };
 
-  const closeModalBox = () => {
+  const closeConfirmationModal = () => {
     dispatch(setShowModal({ addUpdateModal: false, deletedModal: false }));
     dispatch(setSelectedTodoId(null));
   };
@@ -154,7 +154,7 @@ const Todos = () => {
             <TodoItem
               key={index}
               todo={todo}
-              openModalBox={openModalBox}
+              openConfirmationModal={openConfirmationModal}
               updateDataInTodoInputValue={updateDataInTodoInputValue}
             />
           );
@@ -172,9 +172,9 @@ const Todos = () => {
         />
       )}
       {showModal.deletedModal && (
-        <ModalBox
+        <ConfirmationModal
           modalBtnClick={deleteTodoItem}
-          closeModalBox={closeModalBox}
+          closeConfirmationModal={closeConfirmationModal}
           popupTitle="Delete"
           popupDesc="Are you sure you want to delete this item ?"
           btnText="Delete"
