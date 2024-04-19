@@ -4,20 +4,25 @@ import { AiOutlinePlusCircle } from "react-icons/ai";
 import TodoItem from "./TodoItem";
 import moment from "moment";
 import PopUpModal from "./PopUpModal";
-import DeleteModal from "./DeleteModal";
+import ModalBox from "./ModalBox";
 import { useDispatch, useSelector } from "react-redux";
-import { addTodo, deleteTodo, updateTodo } from "../redux/reducer/todoReducer";
+import {
+  addTodo,
+  deleteTodo,
+  setSelectedTodoId,
+  updateTodo,
+} from "../redux/reducer/todoReducer";
+import { setShowModal } from "../redux/reducer/modalReducer";
 
 const Todos = () => {
-  const { todos } = useSelector((state) => state);
+  const { todos } = useSelector((state) => state.todos);
+  const { selectedTodoId } = useSelector((state) => state.todos);
+
+  const { showModal } = useSelector((state) => state.showModal);
+
   const dispatch = useDispatch();
-  const [showModal, setShowModal] = useState({
-    addUpdateModal: false,
-    deletedModal: false,
-  });
   const [error, setError] = useState(false);
   const [isDateValid, setIsDateValid] = useState(false);
-  const [selectedTodoId, setSelectedTodoId] = useState(null);
   const [currentTimeAndDate, setCurrentTimeAndDate] = useState(
     moment().format("YYYY-MM-DDTHH:mm")
   );
@@ -30,13 +35,9 @@ const Todos = () => {
     setTodoInputValue({ ...todoInputValue, [e.target.name]: e.target.value });
   };
 
-  const openTodoPopupModal = () => {
-    setShowModal({ addUpdateModal: true, deletedModal: false });
-  };
-
   const closeTodoPopupModal = () => {
-    setShowModal({ addUpdateModal: false, deletedModal: false });
-    setSelectedTodoId(null);
+    dispatch(setShowModal({ addUpdateModal: false, deletedModal: false }));
+    dispatch(setSelectedTodoId(null));
     setTodoInputValue({
       todoTitle: "",
       time: moment().format("YYYY-MM-DDTHH:mm"),
@@ -80,7 +81,7 @@ const Todos = () => {
         time: todoInputValue.time,
       };
       dispatch(updateTodo(updatedTodo));
-      setSelectedTodoId(null);
+      dispatch(setSelectedTodoId(null));
     } else {
       const newTodo = {
         id: Date.now(),
@@ -95,27 +96,27 @@ const Todos = () => {
       todoTitle: "",
       time: moment().format("YYYY-MM-DDTHH:mm"),
     });
-    setShowModal({ addUpdateModal: false, deletedModal: false });
+    dispatch(setShowModal({ addUpdateModal: false, deletedModal: false }));
     setError(false);
     setIsDateValid(false);
   };
 
   const deleteTodoItem = (id) => {
     dispatch(deleteTodo(id));
-    setShowModal({ addUpdateModal: false, deletedModal: false });
-    setSelectedTodoId(false);
+    dispatch(setShowModal({ addUpdateModal: false, deletedModal: false }));
+    dispatch(setSelectedTodoId(null));
   };
 
   const openDeletedModal = (id) => {
-    setShowModal({ addUpdateModal: false, deletedModal: true });
-    setSelectedTodoId(id);
+    dispatch(setShowModal({ addUpdateModal: false, deletedModal: true }));
+    dispatch(setSelectedTodoId(id));
   };
 
   //this function set todoInputValue base on id
   const updateDataInTodoInputValue = (todo) => {
     setTodoInputValue({ todoTitle: todo.title, time: todo.time });
-    setSelectedTodoId(todo.id);
-    setShowModal({ addUpdateModal: true, deletedModal: false });
+    dispatch(setSelectedTodoId(todo.id));
+    dispatch(setShowModal({ addUpdateModal: true, deletedModal: false }));
   };
 
   //We use seInterval in useEffect for update currentTimeAndDate in every seconds. currenTimeAndDate used for update navbar time.
@@ -132,43 +133,47 @@ const Todos = () => {
         <h1 className="text-3xl font-bold">Today</h1>
         <div
           className="text-3xl text-blue-500 cursor-pointer"
-          onClick={openTodoPopupModal}
+          onClick={() =>
+            dispatch(
+              setShowModal({ addUpdateModal: true, deletedModal: false })
+            )
+          }
         >
           <AiOutlinePlusCircle />
         </div>
       </div>
-      {todos.length === 0 && (
+      {todos?.length === 0 ? (
         <h1 className="text-center text-xl font-semibold">Todo is Empty</h1>
+      ) : (
+        todos.map((todo, index) => {
+          return (
+            <TodoItem
+              key={index}
+              todo={todo}
+              openDeletedModal={openDeletedModal}
+              updateDataInTodoInputValue={updateDataInTodoInputValue}
+            />
+          );
+        })
       )}
-      {todos?.map((todo, index) => {
-        return (
-          <TodoItem
-            key={index}
-            todo={todo}
-            openDeletedModal={openDeletedModal}
-            updateDataInTodoInputValue={updateDataInTodoInputValue}
-            // isTodoComplete={isTodoComplete}
-          />
-        );
-      })}
 
-      <PopUpModal
-        showModal={showModal}
-        selectedTodoId={selectedTodoId}
-        todoInputValue={todoInputValue}
-        changeTodoInputValue={changeTodoInputValue}
-        closeTodoPopupModal={closeTodoPopupModal}
-        createOrUpdateTodo={createOrUpdateTodo}
-        error={error}
-        isDateValid={isDateValid}
-      />
-      <DeleteModal
-        showModal={showModal}
-        setShowModal={setShowModal}
-        deleteTodoItem={deleteTodoItem}
-        selectedTodoId={selectedTodoId}
-        setSelectedTodoId={setSelectedTodoId}
-      />
+      {showModal.addUpdateModal && (
+        <PopUpModal
+          todoInputValue={todoInputValue}
+          changeTodoInputValue={changeTodoInputValue}
+          closeTodoPopupModal={closeTodoPopupModal}
+          createOrUpdateTodo={createOrUpdateTodo}
+          error={error}
+          isDateValid={isDateValid}
+        />
+      )}
+      {showModal.deletedModal && (
+        <ModalBox
+          modalBtnClick={deleteTodoItem}
+          popupTitle="Delete"
+          popupDesc="Are you sure you want to delete this item ?"
+        />
+      )}
     </div>
   );
 };
