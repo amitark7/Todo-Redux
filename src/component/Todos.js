@@ -3,7 +3,7 @@ import Navbar from "./Navbar";
 import { AiOutlinePlusCircle } from "react-icons/ai";
 import TodoItem from "./TodoItem";
 import moment from "moment";
-import PopUpModal from "./PopUpModal";
+import AddOrUpdateModal from "./AddOrUpdateModal";
 import ModalBox from "./ModalBox";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -17,7 +17,6 @@ import { setShowModal } from "../redux/reducer/modalReducer";
 const Todos = () => {
   const { todos } = useSelector((state) => state.todos);
   const { selectedTodoId } = useSelector((state) => state.todos);
-
   const { showModal } = useSelector((state) => state.showModal);
 
   const dispatch = useDispatch();
@@ -112,6 +111,11 @@ const Todos = () => {
     dispatch(setSelectedTodoId(id));
   };
 
+  const closeModalBox = () => {
+    dispatch(setShowModal({ addUpdateModal: false, deletedModal: false }));
+    dispatch(setSelectedTodoId(null));
+  };
+
   //this function set todoInputValue base on id
   const updateDataInTodoInputValue = (todo) => {
     setTodoInputValue({ todoTitle: todo.title, time: todo.time });
@@ -158,7 +162,7 @@ const Todos = () => {
       )}
 
       {showModal.addUpdateModal && (
-        <PopUpModal
+        <AddOrUpdateModal
           todoInputValue={todoInputValue}
           changeTodoInputValue={changeTodoInputValue}
           closeTodoPopupModal={closeTodoPopupModal}
@@ -170,8 +174,10 @@ const Todos = () => {
       {showModal.deletedModal && (
         <ModalBox
           modalBtnClick={deleteTodoItem}
+          closeModalBox={closeModalBox}
           popupTitle="Delete"
           popupDesc="Are you sure you want to delete this item ?"
+          btnText="Delete"
         />
       )}
     </div>
