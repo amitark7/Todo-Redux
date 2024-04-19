@@ -106,9 +106,9 @@ const Todos = () => {
     dispatch(setSelectedTodoId(null));
   };
 
-  const openDeletedModal = (id) => {
+  const openModalBox = (todo) => {
     dispatch(setShowModal({ addUpdateModal: false, deletedModal: true }));
-    dispatch(setSelectedTodoId(id));
+    dispatch(setSelectedTodoId(todo.id));
   };
 
   const closeModalBox = () => {
@@ -154,7 +154,7 @@ const Todos = () => {
             <TodoItem
               key={index}
               todo={todo}
-              openDeletedModal={openDeletedModal}
+              openModalBox={openModalBox}
               updateDataInTodoInputValue={updateDataInTodoInputValue}
             />
           );
