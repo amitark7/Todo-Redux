@@ -6,22 +6,18 @@ import moment from "moment";
 import AddOrUpdateModal from "./AddOrUpdateModal";
 import ConfirmationModal from "./ConfirmationModal";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  addTodo,
-  deleteTodo,
-  setSelectedTodoId,
-  updateTodo,
-} from "../redux/reducer/todoReducer";
-import { setShowModal } from "../redux/reducer/modalReducer";
+import { addTodo, deleteTodo, updateTodo } from "../redux/reducer/todoReducer";
 
 const Todos = () => {
   const { todos } = useSelector((state) => state.todos);
-  const { selectedTodoId } = useSelector((state) => state.todos);
-  const { showModal } = useSelector((state) => state.showModal);
 
   const dispatch = useDispatch();
-  const [error, setError] = useState(false);
-  const [isDateValid, setIsDateValid] = useState(false);
+  const [showModal, setShowModal] = useState({
+    addUpdateModal: false,
+    deletedModal: false,
+  });
+  const [selectedTodo, setSelectedTodo] = useState(null);
+  const [error, setError] = useState({ title: false, time: false });
   const [currentTimeAndDate, setCurrentTimeAndDate] = useState(
     moment().format("YYYY-MM-DDTHH:mm")
   );
@@ -32,55 +28,65 @@ const Todos = () => {
 
   const changeTodoInputValue = (e) => {
     setTodoInputValue({ ...todoInputValue, [e.target.name]: e.target.value });
-  };
-
-  const closeTodoPopupModal = () => {
-    dispatch(setShowModal({ addUpdateModal: false, deletedModal: false }));
-    dispatch(setSelectedTodoId(null));
-    setTodoInputValue({
-      todoTitle: "",
-      time: moment().format("YYYY-MM-DDTHH:mm"),
-    });
-    setIsDateValid(false);
-    setError(false);
-  };
-
-  //This function createOrUpdateTodo
-  const createOrUpdateTodo = () => {
-    if (
-      todoInputValue.todoTitle.trim() === "" &&
-      (moment(todoInputValue.time).isValid() ||
-        !moment(todoInputValue.time).isBefore(moment()))
-    ) {
-      setIsDateValid(false);
-    }
-
+    let err = {
+      title: false,
+      time: false,
+    };
     if (todoInputValue.todoTitle.trim() === "") {
-      setError(true);
-      return;
+      err.title = true;
     } else {
-      setError(false);
+      err.title = false;
     }
 
     if (
       !moment(todoInputValue.time).isValid() ||
       moment(todoInputValue.time).isBefore(moment())
     ) {
-      setIsDateValid(true);
-      return;
+      err.time = true;
     } else {
-      setIsDateValid(false);
+      err.time = false;
+    }
+    setError(err);
+  };
+
+  const closeAddOrUpdateModal = () => {
+    setShowModal({ addUpdateModal: false, deletedModal: false });
+    setSelectedTodo(null);
+    setTodoInputValue({
+      todoTitle: "",
+      time: moment().format("YYYY-MM-DDTHH:mm"),
+    });
+    setError({ title: false, time: false });
+  };
+
+  //This function createOrUpdateTodo
+  const createOrUpdateTodo = () => {
+    let err = {
+      title: false,
+      time: false,
+    };
+    if (
+      todoInputValue.todoTitle.trim() === "" ||
+      !moment(todoInputValue.time).isValid() ||
+      moment(todoInputValue.time).isBefore(moment())
+    ) {
+      todoInputValue.todoTitle.trim() === "" && (err.title = true);
+      (!moment(todoInputValue.time).isValid() ||
+        moment(todoInputValue.time).isBefore(moment())) &&
+        (err.time = true);
+      setError(err);
+      return;
     }
 
-    //If selectedTodoId exist then we enter in true block and perform update operation otherwise add todo
-    if (selectedTodoId) {
+    //If selectedTodo exist then we enter in true block and perform update operation otherwise add todo
+    if (selectedTodo) {
       const updatedTodo = {
-        id: selectedTodoId,
+        id: selectedTodo.id,
         title: todoInputValue.todoTitle,
         time: todoInputValue.time,
       };
       dispatch(updateTodo(updatedTodo));
-      dispatch(setSelectedTodoId(null));
+      setSelectedTodo(null);
     } else {
       const newTodo = {
         id: Date.now(),
@@ -95,32 +101,31 @@ const Todos = () => {
       todoTitle: "",
       time: moment().format("YYYY-MM-DDTHH:mm"),
     });
-    dispatch(setShowModal({ addUpdateModal: false, deletedModal: false }));
-    setError(false);
-    setIsDateValid(false);
+    setShowModal({ addUpdateModal: false, deletedModal: false });
+    setError({ title: false, time: false });
   };
 
-  const deleteTodoItem = (id) => {
-    dispatch(deleteTodo(id));
-    dispatch(setShowModal({ addUpdateModal: false, deletedModal: false }));
-    dispatch(setSelectedTodoId(null));
+  const deleteTodoItem = () => {
+    dispatch(deleteTodo(selectedTodo));
+    setShowModal({ addUpdateModal: false, deletedModal: false });
+    setSelectedTodo(null);
   };
 
   const openConfirmationModal = (todo) => {
-    dispatch(setShowModal({ addUpdateModal: false, deletedModal: true }));
-    dispatch(setSelectedTodoId(todo.id));
+    setShowModal({ addUpdateModal: false, deletedModal: true });
+    setSelectedTodo(todo);
   };
 
   const closeConfirmationModal = () => {
-    dispatch(setShowModal({ addUpdateModal: false, deletedModal: false }));
-    dispatch(setSelectedTodoId(null));
+    setShowModal({ addUpdateModal: false, deletedModal: false });
+    setSelectedTodo(null);
   };
 
   //this function set todoInputValue base on id
   const updateDataInTodoInputValue = (todo) => {
     setTodoInputValue({ todoTitle: todo.title, time: todo.time });
-    dispatch(setSelectedTodoId(todo.id));
-    dispatch(setShowModal({ addUpdateModal: true, deletedModal: false }));
+    setSelectedTodo(todo);
+    setShowModal({ addUpdateModal: true, deletedModal: false });
   };
 
   //We use seInterval in useEffect for update currentTimeAndDate in every seconds. currenTimeAndDate used for update navbar time.
@@ -138,9 +143,7 @@ const Todos = () => {
         <div
           className="text-3xl text-blue-500 cursor-pointer"
           onClick={() =>
-            dispatch(
-              setShowModal({ addUpdateModal: true, deletedModal: false })
-            )
+            setShowModal({ addUpdateModal: true, deletedModal: false })
           }
         >
           <AiOutlinePlusCircle />
@@ -163,20 +166,20 @@ const Todos = () => {
 
       {showModal.addUpdateModal && (
         <AddOrUpdateModal
+          selectedTodo={selectedTodo}
           todoInputValue={todoInputValue}
           changeTodoInputValue={changeTodoInputValue}
-          closeTodoPopupModal={closeTodoPopupModal}
+          closeAddOrUpdateModal={closeAddOrUpdateModal}
           createOrUpdateTodo={createOrUpdateTodo}
           error={error}
-          isDateValid={isDateValid}
         />
       )}
       {showModal.deletedModal && (
         <ConfirmationModal
           modalBtnClick={deleteTodoItem}
           closeConfirmationModal={closeConfirmationModal}
-          popupTitle="Delete"
-          popupDesc="Are you sure you want to delete this item ?"
+          modalTitle="Delete"
+          modalDesc="Are you sure you want to delete this item ?"
           btnText="Delete"
         />
       )}
