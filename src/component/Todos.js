@@ -23,7 +23,7 @@ const Todos = () => {
   );
   const [todoInputValue, setTodoInputValue] = useState({
     todoTitle: "",
-    time: moment().format("YYYY-MM-DDTHH:mm"),
+    time: currentTimeAndDate,
   });
 
   const changeTodoInputValue = (e) => {
@@ -51,7 +51,7 @@ const Todos = () => {
     setSelectedTodo(null);
     setTodoInputValue({
       todoTitle: "",
-      time: moment().format("YYYY-MM-DDTHH:mm"),
+      time: currentTimeAndDate,
     });
     setError({ title: false, time: false });
   };
@@ -133,7 +133,7 @@ const Todos = () => {
 
   return (
     <div className="w-full mx-auto relative pb-10 border-2 shadow-md sm:w-3/5 md:w-2/4 lg:w-2/5 2xl:w-2/6">
-      <Navbar currentTimeAndDate={currentTimeAndDate} />
+      <Navbar />
       <div className="flex justify-between items-center px-3 mt-2 mb-6">
         <h1 className="text-3xl font-bold">Today</h1>
         <div
