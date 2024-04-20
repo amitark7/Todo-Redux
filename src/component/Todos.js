@@ -27,29 +27,30 @@ const Todos = () => {
   });
 
   const changeTodoInputValue = (e) => {
-    setTodoInputValue({ ...todoInputValue, [e.target.name]: e.target.value });
     let err = {
       title: false,
       time: false,
     };
-    if (todoInputValue.todoTitle.trim() === "") {
+
+    if (e.target.name === "todoTitle" && e.target.value.trim() === "") {
       err.title = true;
     } else {
       err.title = false;
     }
 
     if (
-      !moment(todoInputValue.time).isValid() ||
-      moment(todoInputValue.time).isBefore(moment())
+      (e.target.name === "time" && !moment(e.target.value).isValid()) ||
+      moment(e.target.value).isBefore(moment())
     ) {
       err.time = true;
     } else {
       err.time = false;
     }
     setError(err);
+    setTodoInputValue({ ...todoInputValue, [e.target.name]: e.target.value });
   };
 
-  const closeAddOrUpdateModal = () => {
+  const resetValue = () => {
     setShowModal({ addUpdateModal: false, deletedModal: false });
     setSelectedTodo(null);
     setTodoInputValue({
@@ -57,6 +58,10 @@ const Todos = () => {
       time: moment().format("YYYY-MM-DDTHH:mm"),
     });
     setError({ title: false, time: false });
+  };
+
+  const closeAddOrUpdateModal = () => {
+    resetValue();
   };
 
   //This function createOrUpdateTodo
@@ -97,12 +102,7 @@ const Todos = () => {
       };
       dispatch(addTodo(newTodo));
     }
-    setTodoInputValue({
-      todoTitle: "",
-      time: moment().format("YYYY-MM-DDTHH:mm"),
-    });
-    setShowModal({ addUpdateModal: false, deletedModal: false });
-    setError({ title: false, time: false });
+    resetValue();
   };
 
   const deleteTodoItem = () => {
@@ -122,7 +122,7 @@ const Todos = () => {
   };
 
   //this function set todoInputValue base on id
-  const updateDataInTodoInputValue = (todo) => {
+  const openAddOrUpdateModal = (todo) => {
     setTodoInputValue({ todoTitle: todo.title, time: todo.time });
     setSelectedTodo(todo);
     setShowModal({ addUpdateModal: true, deletedModal: false });
@@ -158,7 +158,7 @@ const Todos = () => {
               key={index}
               todo={todo}
               openConfirmationModal={openConfirmationModal}
-              updateDataInTodoInputValue={updateDataInTodoInputValue}
+              openAddOrUpdateModal={openAddOrUpdateModal}
             />
           );
         })
