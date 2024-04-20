@@ -10,7 +10,7 @@ import { addTodo, deleteTodo, updateTodo } from "../redux/reducer/todoReducer";
 
 const Todos = () => {
   const { todos } = useSelector((state) => state.todos);
-
+  console.log(todos);
   const dispatch = useDispatch();
   const [showModal, setShowModal] = useState({
     addUpdateModal: false,
@@ -34,8 +34,6 @@ const Todos = () => {
 
     if (e.target.name === "todoTitle" && e.target.value.trim() === "") {
       err.title = true;
-    } else {
-      err.title = false;
     }
 
     if (
@@ -43,8 +41,6 @@ const Todos = () => {
       moment(e.target.value).isBefore(moment())
     ) {
       err.time = true;
-    } else {
-      err.time = false;
     }
     setError(err);
     setTodoInputValue({ ...todoInputValue, [e.target.name]: e.target.value });

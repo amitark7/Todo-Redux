@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { BiAlarm } from "react-icons/bi";
 import { MdDelete } from "react-icons/md";
 import { MdEdit } from "react-icons/md";
@@ -8,6 +8,7 @@ import { isTodoComplete } from "../redux/reducer/todoReducer";
 
 const TodoItem = ({ todo, openConfirmationModal, openAddOrUpdateModal }) => {
   const dispatch = useDispatch();
+  const [seeMore, setSeeMore] = useState(false);
   const boxColor = todo.isComplete ? "bg-green-500" : "bg-purple-600";
   return (
     <div className="flex w-full items-center p-4 mb-2  ">
@@ -22,7 +23,21 @@ const TodoItem = ({ todo, openConfirmationModal, openAddOrUpdateModal }) => {
       />
       <div className="flex justify-between items-center w-[96%] pb-4 border-b-2">
         <div className="text-base break-words w-[80%] pl-4">
-          <p className="text-lg font-semibold w-11/12">{todo.title}</p>
+          <p className="text-lg font-semibold w-11/12">
+            {seeMore
+              ? todo.title
+              : todo.title.length > 30
+              ? `${todo.title.substring(0, 30)}...`
+              : todo.title}
+          </p>
+          {todo.title.length > 30 && (
+            <button
+              className="text-xs font-semibold underline"
+              onClick={() => setSeeMore(!seeMore)}
+            >
+              {seeMore ? "See Less..." : "See More..."}
+            </button>
+          )}
           <p className="flex items-center text-gray-400 text-sm">
             <BiAlarm /> {moment(todo.time).format("YYYY-MM-DD HH:mm")}
           </p>

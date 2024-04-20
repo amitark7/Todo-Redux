@@ -9,17 +9,14 @@ const todoReducer = createSlice({
     },
 
     updateTodo: (state, action) => {
-      state.todos = state.todos.map((todo) => {
-        if (todo.id === action.payload.id) {
-          return {
-            ...todo,
-            title: action.payload.title,
-            time: action.payload.time,
-          };
-        } else {
-          return todo;
-        }
-      });
+      const todoIndex = state.todos.findIndex(
+        (todo) => todo.id === action.payload.id
+      );
+      state.todos[todoIndex] = {
+        ...state.todos[todoIndex],
+        title: action.payload.title,
+        time: action.payload.time,
+      };
     },
 
     deleteTodo: (state, action) => {
@@ -27,13 +24,13 @@ const todoReducer = createSlice({
     },
 
     isTodoComplete: (state, action) => {
-      state.todos = state.todos.map((todo) => {
-        if (todo.id === action.payload) {
-          return { ...todo, isComplete: !todo.isComplete };
-        } else {
-          return todo;
-        }
-      });
+      const todoIndex = state.todos.findIndex(
+        (todo) => todo.id === action.payload
+      );
+      state.todos[todoIndex] = {
+        ...state.todos[todoIndex],
+        isComplete: !state.todos[todoIndex].isComplete,
+      };
     },
   },
 });
